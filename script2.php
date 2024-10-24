@@ -72,24 +72,10 @@ if (empty($arquivos)) {
     exit;
 }
 
-// Perguntar ao usuário se ele quer sobrescrever ou adicionar ao arquivo existente
-$resposta = readline("Deseja sobrescrever o arquivo existente ou adicionar ao arquivo? (sobrescrever (1)/adicionar (2)): ");
-$linhas = [];
-
-// Verificar se o arquivo já existe
-$arquivo_excel = 'relacao_cargas.xlsx';
-if (file_exists($arquivo_excel) && strtolower($resposta) === '1') {
-    echo "Carregando dados do arquivo existente...\n";
-    // Carregar os dados do arquivo existente
-    $xlsx = SimpleXLSX::parse($arquivo_excel);
-    $linhas = $xlsx->rows();
-    array_shift($linhas); // Remover cabeçalho para evitar duplicação
-} else {
-    // Iniciar com o cabeçalho se estiver sobrescrevendo ou criando novo
-    $linhas = [
-        ['Transportadora', 'Endereço', 'Cidade', 'AWB', 'Volume', 'Peso', 'Peso Cubado', 'Peso Taxado', 'Valor', 'Destino']
-    ];
-}
+// Iniciar com o cabeçalho
+$linhas = [
+    ['Transportadora', 'Endereço', 'Cidade', 'AWB', 'Volume', 'Peso', 'Peso Cubado', 'Peso Taxado', 'Valor', 'Destino']
+];
 
 echo "Iniciando a extração de dados dos arquivos...\n";
 
@@ -113,11 +99,10 @@ foreach ($arquivos as $arquivo) {
     }
 }
 
-// Gerar o nome do arquivo com data e hora caso o usuário queira sobrescrever
-if (strtolower($resposta) === '2') {
-    $data_hora = date('Ymd_His');
-    $arquivo_excel = "relacao_cargas_$data_hora.xlsx";
-}
+// Usar o nome da pasta para gerar o nome do arquivo
+$nome_pasta = basename(rtrim($caminho_pasta, DIRECTORY_SEPARATOR));
+$data_hora = date('Ymd_His');
+$arquivo_excel = "{$nome_pasta}_$data_hora.xlsx";
 
 echo "Gerando o arquivo Excel...\n";
 
